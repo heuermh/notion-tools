@@ -6,9 +6,10 @@ authors = ["Patch Biosciences, Inc. <contact@patch.bio>"]
 license = "Apache-2.0"
 
 [tool.poetry.dependencies]
-python = ">= 3.6"
-notion-client = ">= 0.4"
-pandas = ">= 1.0"
+python = ">= 3.8, <4"
+notion-client = ">= 1.0"
+pandas = ">= 1.4"
+numpy = ">= 1.22"
 
 [tool.poetry.dev-dependencies]
 pytest = ">= 6"
