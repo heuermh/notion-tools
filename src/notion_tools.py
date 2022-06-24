@@ -255,3 +255,44 @@ def users_to_dataframe(notion_client: NotionClient):
         response = notion_client.users.list(start_cursor=response["next_cursor"])
         results += response["results"]
     return pd.DataFrame(map(_user_to_simple_dict, results))
+
+
+def database_to_dbml(notion_client: NotionClient, database_id: str):
+    """Dumps a Notion Database to stdout in DBML (https://www.dbml.org/) format.
+
+    Parameters
+    ----------
+    notion_client
+        The Notion API client.
+    database_id
+        The Notion Database ID. This identifier can be found in the URL of the
+        database.
+    """
+    response = notion_client.databases.retrieve(database_id)
+    title = response["title"][0]["plain_text"]
+    print(f'Table \"{title}\" {{')
+    for property in sorted(response["properties"].values(), key=lambda x:x["name"].lower()):
+        name = property["name"]
+        type_ = property["type"]
+        if not name.startswith("Related to"):
+            print(f'  \"{name}\"  \"{type_}\"')
+    print("}")
+
+
+def dataframe_to_dbml(title: str, df: pd.DataFrame):
+    """Dumps a Notion Database as a Pandas DataFrame to stdout in DBML (https://www.dbml.org/) format.
+
+    Parameters
+    ----------
+    title
+        Notion Database title.
+    pd.DataFrame
+        The Notion Database as a Pandas DataFrame.
+    """
+    print(f'Table \"{title}\" {{')
+    properties = df.dtypes.to_dict()
+    for name in sorted(properties, key=lambda x:x.lower()):
+        if not name.startswith("Related to"):
+            type_ = properties[name]
+            print(f'  \"{name}\"  \"{type_}\"')
+    print("}")
